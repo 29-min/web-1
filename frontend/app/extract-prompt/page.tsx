@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Wand2, Loader2, Copy, Check, Link as LinkIcon, Sparkles, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface StyleAnalysis {
     tone: string;
@@ -77,7 +78,7 @@ export default function ExtractPromptPage() {
         abortControllerRef.current = new AbortController();
 
         try {
-            const response = await fetch('http://localhost:8000/analyze-style', {
+            const response = await fetch(`${API_BASE_URL}/analyze-style`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url }),

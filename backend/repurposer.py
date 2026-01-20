@@ -26,9 +26,9 @@ class ContentRepurposer:
     """콘텐츠를 여러 채널용으로 변환하는 클래스"""
     
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         if not self.api_key:
-            raise ValueError("GEMINI_API_KEY가 필요합니다. .env 파일에 설정하세요.")
+            raise ValueError("API Key가 필요합니다. .env 파일에 GEMINI_API_KEY 또는 GOOGLE_API_KEY를 설정하세요.")
         
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",

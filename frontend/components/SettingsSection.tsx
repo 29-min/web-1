@@ -1,5 +1,5 @@
 import React from 'react';
-import { CHANNELS, TONES, TARGETS } from '@/lib/constants';
+import { CHANNELS, TONES, TARGETS, API_BASE_URL } from '@/lib/constants';
 import { Sparkles, Sliders } from 'lucide-react';
 
 interface SettingsSectionProps {
@@ -77,7 +77,7 @@ export default function SettingsSection({
         for (const channel of selectedChannels) {
             if (!newPrompts[channel]) {
                 try {
-                    const res = await fetch(`http://localhost:8000/prompts/${channel}`);
+                    const res = await fetch(`${API_BASE_URL}/prompts/${channel}`);
                     if (res.ok) {
                         const data = await res.json();
                         newPrompts[channel] = data.prompt;
@@ -93,7 +93,7 @@ export default function SettingsSection({
 
     const resetPrompt = async (channel: string) => {
         try {
-            const res = await fetch(`http://localhost:8000/prompts/${channel}`);
+            const res = await fetch(`${API_BASE_URL}/prompts/${channel}`);
             if (res.ok) {
                 const data = await res.json();
                 setCustomPrompts(prev => ({ ...prev, [channel]: data.prompt }));
