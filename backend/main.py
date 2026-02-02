@@ -15,10 +15,16 @@ from style_analyzer import StyleAnalyzer
 
 load_dotenv()
 
+# YouTube 관련 모듈 import
+import youtube_analyzer
+from youtube_analyzer import SearchFilters
+import transcript
+import script_generator
+
 app = FastAPI(
     title="Content Repurposer API",
-    description="콘텐츠를 여러 소셜 미디어 채널에 맞게 변환하는 API",
-    version="1.0.0"
+    description="콘텐츠를 여러 소셜 미디어 채널에 맞게 변환하는 API + YouTube 대본 추출",
+    version="2.0.0"
 )
 
 # CORS 설정 (프론트엔드 연동용)
@@ -87,10 +93,34 @@ class StyleAnalysisResponse(BaseModel):
     generated_prompt: str
 
 
+# YouTube 관련 Pydantic 모델
+class YouTubeSearchRequest(BaseModel):
+    keyword: str
+    top_n: int = 10
+    shorts_only: bool = False
+    exclude_shorts: bool = False
+    duration_filter: str = "any"
+    upload_period: str = "any"
+    language: str = "any"
+    recency_weight: int = 25
+    engagement_weight: int = 40
+    views_weight: int = 35
+    trending_mode: bool = False
+    min_views: int = 0
+
+
+class RewriteRequest(BaseModel):
+    original_script: str
+    style: str = "informative"
+    target_length: str = "similar"
+    additional_instructions: str = ""
+    provider: str = "gemini"
+
+
 # API 엔드포인트
 @app.get("/")
 async def root():
-    return {"message": "Content Repurposer API", "version": "1.0.0"}
+    return {"message": "Content Repurposer API", "version": "2.0.0"}
 
 
 @app.post("/analyze-style", response_model=StyleAnalysisResponse)
@@ -254,7 +284,192 @@ async def transform_content(request: TransformRequest):
 @app.get("/health")
 async def health_check():
     """헬스 체크"""
-    return {"status": "healthy"}
+    return {"status": "healthy", "youtube_enabled": bool(os.getenv("YOUTUBE_API_KEY"))}
+
+
+# ============================================
+# YouTube 관련 API 엔드포인트
+# ============================================
+
+@app.get("/youtube/search")
+async def youtube_search_get(
+    keyword: str,
+    top_n: int = 10,
+    shorts_only: bool = False,
+    exclude_shorts: bool = False,
+    duration_filter: str = "any",
+    upload_period: str = "any",
+    language: str = "any",
+    recency_weight: int = 25,
+    engagement_weight: int = 40,
+    views_weight: int = 35,
+    trending_mode: bool = False,
+    min_views: int = 0
+):
+    """YouTube 영상 검색 (GET)"""
+    if not os.getenv("YOUTUBE_API_KEY"):
+        raise HTTPException(status_code=500, detail="YOUTUBE_API_KEY가 설정되지 않았습니다.")
+    
+    try:
+        filters = SearchFilters(
+            shorts_only=shorts_only,
+            exclude_shorts=exclude_shorts,
+            duration_filter=duration_filter,
+            upload_period=upload_period,
+            language=language,
+            recency_weight=recency_weight,
+            engagement_weight=engagement_weight,
+            views_weight=views_weight,
+            trending_mode=trending_mode,
+            min_views=min_views
+        )
+        
+        results = youtube_analyzer.analyze_top_videos(keyword, top_n, filters)
+        
+        return {
+            "success": True,
+            "keyword": keyword,
+            "count": len(results),
+            "videos": results
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/youtube/search")
+async def youtube_search_post(request: YouTubeSearchRequest):
+    """YouTube 영상 검색 (POST)"""
+    if not os.getenv("YOUTUBE_API_KEY"):
+        raise HTTPException(status_code=500, detail="YOUTUBE_API_KEY가 설정되지 않았습니다.")
+    
+    try:
+        filters = SearchFilters(
+            shorts_only=request.shorts_only,
+            exclude_shorts=request.exclude_shorts,
+            duration_filter=request.duration_filter,
+            upload_period=request.upload_period,
+            language=request.language,
+            recency_weight=request.recency_weight,
+            engagement_weight=request.engagement_weight,
+            views_weight=request.views_weight,
+            trending_mode=request.trending_mode,
+            min_views=request.min_views
+        )
+        
+        results = youtube_analyzer.analyze_top_videos(request.keyword, request.top_n, filters)
+        
+        return {
+            "success": True,
+            "keyword": request.keyword,
+            "count": len(results),
+            "videos": results
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/youtube/trending")
+async def youtube_trending(top_n: int = 10):
+    """오늘의 인기 영상 (AI 개발 관련)"""
+    if not os.getenv("YOUTUBE_API_KEY"):
+        raise HTTPException(status_code=500, detail="YOUTUBE_API_KEY가 설정되지 않았습니다.")
+    
+    trending_keywords = ["AI 개발", "인공지능 개발", "ChatGPT 활용"]
+    
+    try:
+        all_videos = []
+        filters = SearchFilters(
+            exclude_shorts=True,
+            upload_period="week",
+            trending_mode=True,
+            recency_weight=30,
+            engagement_weight=40,
+            views_weight=30
+        )
+        
+        for keyword in trending_keywords[:2]:
+            try:
+                results = youtube_analyzer.analyze_top_videos(keyword, 10, filters)
+                all_videos.extend(results)
+            except:
+                continue
+        
+        # 중복 제거
+        seen_ids = set()
+        unique_videos = []
+        for video in all_videos:
+            if video["video_id"] not in seen_ids:
+                seen_ids.add(video["video_id"])
+                unique_videos.append(video)
+        
+        unique_videos.sort(key=lambda x: x.get("views_per_day", 0), reverse=True)
+        
+        return {
+            "success": True,
+            "type": "trending",
+            "count": min(len(unique_videos), top_n),
+            "videos": unique_videos[:top_n]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/youtube/transcript/{video_id}")
+async def youtube_transcript(
+    video_id: str,
+    lang: str = "ko",
+    timestamps: bool = False
+):
+    """YouTube 영상 스크립트/자막 추출"""
+    lang_priority = {
+        "ko": ["ko", "en", "ja"],
+        "en": ["en", "ko", "ja"],
+        "ja": ["ja", "ko", "en"],
+        "zh": ["zh-Hans", "zh-Hant", "ko", "en"]
+    }
+    languages = lang_priority.get(lang, ["ko", "en"])
+    
+    result = transcript.get_transcript(
+        video_id,
+        languages=languages,
+        include_timestamps=timestamps
+    )
+    
+    if not result["success"]:
+        raise HTTPException(status_code=404, detail=result["error"])
+    
+    return result
+
+
+@app.get("/youtube/transcript/{video_id}/languages")
+async def youtube_transcript_languages(video_id: str):
+    """영상의 사용 가능한 자막 언어 목록"""
+    result = transcript.get_available_languages(video_id)
+    
+    if not result["success"]:
+        raise HTTPException(status_code=404, detail=result["error"])
+    
+    return result
+
+
+@app.post("/youtube/rewrite")
+async def youtube_rewrite(request: RewriteRequest):
+    """AI를 활용한 스크립트 재구성"""
+    if not request.original_script.strip():
+        raise HTTPException(status_code=400, detail="원본 스크립트가 비어있습니다.")
+    
+    result = script_generator.rewrite_script(
+        original_script=request.original_script,
+        style=request.style,
+        target_length=request.target_length,
+        additional_instructions=request.additional_instructions,
+        provider_name=request.provider
+    )
+    
+    if not result["success"]:
+        raise HTTPException(status_code=500, detail=result["error"])
+    
+    return result
 
 
 if __name__ == "__main__":
