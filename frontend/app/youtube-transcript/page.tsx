@@ -222,8 +222,8 @@ export default function YouTubeTranscriptPage() {
                                         key={tab.key}
                                         onClick={() => setActiveFilterTab(tab.key as FilterTab)}
                                         className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${activeFilterTab === tab.key
-                                                ? 'bg-white text-slate-900 shadow-sm'
-                                                : 'text-slate-600 hover:text-slate-900'
+                                            ? 'bg-white text-slate-900 shadow-sm'
+                                            : 'text-slate-600 hover:text-slate-900'
                                             }`}
                                     >
                                         {tab.label}
@@ -233,87 +233,123 @@ export default function YouTubeTranscriptPage() {
 
                             {/* Basic Filters */}
                             {activeFilterTab === 'basic' && (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">콘텐츠 타입</label>
-                                        <select
-                                            value={shortsFilter}
-                                            onChange={(e) => setShortsFilter(e.target.value as any)}
-                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                                        >
-                                            <option value="all">전체</option>
-                                            <option value="shorts-only">쇼츠만</option>
-                                            <option value="exclude-shorts">쇼츠 제외</option>
-                                        </select>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">📹 콘텐츠 타입</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { value: 'all', label: '전체' },
+                                                { value: 'shorts-only', label: '쇼츠만' },
+                                                { value: 'exclude-shorts', label: '쇼츠 제외' },
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => setShortsFilter(opt.value as any)}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${shortsFilter === opt.value
+                                                            ? 'bg-red-500 text-white shadow-md'
+                                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                        }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">언어/지역</label>
-                                        <select
-                                            value={language}
-                                            onChange={(e) => setLanguage(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                                        >
-                                            <option value="any">전체</option>
-                                            <option value="ko">🇰🇷 한국어</option>
-                                            <option value="en">🇺🇸 영어</option>
-                                            <option value="ja">🇯🇵 일본어</option>
-                                            <option value="zh">🇨🇳 중국어</option>
-                                        </select>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">🌐 언어/지역</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { value: 'any', label: '전체' },
+                                                { value: 'ko', label: '🇰🇷 한국어' },
+                                                { value: 'en', label: '🇺🇸 영어' },
+                                                { value: 'ja', label: '🇯🇵 일본어' },
+                                                { value: 'zh', label: '🇨🇳 중국어' },
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => setLanguage(opt.value)}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${language === opt.value
+                                                            ? 'bg-red-500 text-white shadow-md'
+                                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                        }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             )}
 
                             {/* Advanced Filters */}
                             {activeFilterTab === 'advanced' && (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">영상 길이</label>
-                                        <select
-                                            value={durationFilter}
-                                            onChange={(e) => setDurationFilter(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                                        >
-                                            <option value="any">전체</option>
-                                            <option value="short">짧은 (&lt;4분)</option>
-                                            <option value="medium">중간 (4-20분)</option>
-                                            <option value="long">긴 (&gt;20분)</option>
-                                        </select>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">⏱️ 영상 길이</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { value: 'any', label: '전체' },
+                                                { value: 'short', label: '짧은 (<4분)' },
+                                                { value: 'medium', label: '중간 (4-20분)' },
+                                                { value: 'long', label: '긴 (>20분)' },
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => setDurationFilter(opt.value)}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${durationFilter === opt.value
+                                                            ? 'bg-red-500 text-white shadow-md'
+                                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                        }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">업로드 기간</label>
-                                        <select
-                                            value={uploadPeriod}
-                                            onChange={(e) => setUploadPeriod(e.target.value)}
-                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                                        >
-                                            <option value="any">전체</option>
-                                            <option value="day">오늘</option>
-                                            <option value="week">이번 주</option>
-                                            <option value="month">이번 달</option>
-                                            <option value="year">올해</option>
-                                        </select>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">📅 업로드 기간</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { value: 'any', label: '전체' },
+                                                { value: 'day', label: '오늘' },
+                                                { value: 'week', label: '이번 주' },
+                                                { value: 'month', label: '이번 달' },
+                                                { value: 'year', label: '올해' },
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => setUploadPeriod(opt.value)}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${uploadPeriod === opt.value
+                                                            ? 'bg-red-500 text-white shadow-md'
+                                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                        }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">최소 조회수</label>
-                                        <input
-                                            type="number"
-                                            value={minViews}
-                                            onChange={(e) => setMinViews(Number(e.target.value))}
-                                            min="0"
-                                            placeholder="0"
-                                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                                        />
-                                    </div>
-                                    <div className="flex items-end">
-                                        <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 w-full">
+                                    <div className="flex flex-wrap items-end gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">👁️ 최소 조회수</label>
                                             <input
-                                                type="checkbox"
-                                                checked={trendingMode}
-                                                onChange={(e) => setTrendingMode(e.target.checked)}
-                                                className="accent-red-500"
+                                                type="number"
+                                                value={minViews}
+                                                onChange={(e) => setMinViews(Number(e.target.value))}
+                                                min="0"
+                                                placeholder="0"
+                                                className="w-32 px-3 py-2 rounded-lg border border-slate-200 text-sm"
                                             />
-                                            <span className="text-sm">🔥 트렌딩 모드</span>
-                                        </label>
+                                        </div>
+                                        <button
+                                            onClick={() => setTrendingMode(!trendingMode)}
+                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${trendingMode
+                                                    ? 'bg-orange-500 text-white shadow-md'
+                                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                }`}
+                                        >
+                                            🔥 트렌딩 모드
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -412,14 +448,14 @@ export default function YouTubeTranscriptPage() {
                                     <p className="text-xs text-slate-500 mb-2 truncate">{video.channel_title}</p>
                                     <div className="flex flex-wrap gap-1.5 text-xs">
                                         <span className="px-2 py-0.5 bg-slate-100 rounded text-slate-600">
-                                            👁️ {video.view_count.toLocaleString()}
+                                            조회수 {video.view_count.toLocaleString()}
                                         </span>
                                         <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded font-semibold">
-                                            ⭐ {video.quality_score}
+                                            품질점수 {video.quality_score}점
                                         </span>
                                         {video.views_per_day > 0 && (
                                             <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded">
-                                                🔥 {Math.round(video.views_per_day).toLocaleString()}/일
+                                                일평균 {Math.round(video.views_per_day).toLocaleString()}회
                                             </span>
                                         )}
                                     </div>
