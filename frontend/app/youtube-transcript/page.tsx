@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, Play, Copy, Check, Loader2, FileText, RefreshCw, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Search, Play, Copy, Check, Loader2, FileText, RefreshCw, Filter, ChevronDown, ChevronUp, Youtube } from 'lucide-react';
 import {
     searchYouTubeVideos,
     getTrendingVideos,
@@ -64,14 +64,12 @@ export default function YouTubeTranscriptPage() {
             const result = await getTrendingVideos(10);
             setVideos(result.videos);
         } catch (err) {
-            // Trending might fail without API key, that's OK
             console.log('Trending load failed:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Search videos
     const handleSearch = async () => {
         if (!keyword.trim()) return;
 
@@ -102,7 +100,6 @@ export default function YouTubeTranscriptPage() {
         }
     };
 
-    // Get transcript
     const handleGetTranscript = async (video: YouTubeVideo) => {
         setSelectedVideo(video);
         setTranscriptLoading(true);
@@ -121,7 +118,6 @@ export default function YouTubeTranscriptPage() {
         }
     };
 
-    // Copy transcript
     const handleCopy = async () => {
         if (!transcript?.text) return;
         await navigator.clipboard.writeText(transcript.text);
@@ -129,7 +125,6 @@ export default function YouTubeTranscriptPage() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    // Handle rewrite
     const handleRewrite = async () => {
         if (!transcript?.text) return;
 
@@ -150,7 +145,6 @@ export default function YouTubeTranscriptPage() {
         }
     };
 
-    // Copy rewritten script
     const handleCopyRewrite = async () => {
         if (!rewrittenScript) return;
         await navigator.clipboard.writeText(rewrittenScript);
@@ -158,7 +152,6 @@ export default function YouTubeTranscriptPage() {
         setTimeout(() => setRewriteCopied(false), 2000);
     };
 
-    // Get active filter count
     const getActiveFilterCount = () => {
         let count = 0;
         if (shortsFilter !== 'all') count++;
@@ -171,30 +164,30 @@ export default function YouTubeTranscriptPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 md:p-12">
+        <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 md:p-12">
             <div className="max-w-7xl mx-auto">
                 {/* Back Button */}
-                <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">
+                <Link href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-8 transition-colors">
                     <ArrowLeft className="w-4 h-4" />
                     <span>메인으로 돌아가기</span>
                 </Link>
 
                 {/* Header */}
                 <header className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-2xl border border-red-500/30 mb-4">
-                        <span className="text-4xl mr-3">📊</span>
-                        <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-pink-400">
+                    <div className="inline-flex items-center justify-center p-3 bg-white rounded-2xl shadow-lg border border-slate-200 mb-4">
+                        <Youtube className="w-10 h-10 text-red-500 mr-3" />
+                        <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-pink-600">
                             YouTube 콘텐츠 플래너
                         </h1>
-                        <span className="ml-3 px-2 py-0.5 bg-red-500/30 rounded text-xs text-red-300">v2.3</span>
+                        <span className="ml-3 px-2 py-0.5 bg-red-100 text-red-600 rounded text-xs font-semibold">v2.3</span>
                     </div>
-                    <p className="text-slate-400">
+                    <p className="text-slate-600">
                         인기 영상 분석 및 AI 스크립트 재구성 도구
                     </p>
                 </header>
 
                 {/* Search Section */}
-                <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 mb-6">
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 mb-6">
                     <div className="flex gap-4 mb-4">
                         <input
                             type="text"
@@ -202,7 +195,7 @@ export default function YouTubeTranscriptPage() {
                             onChange={(e) => setKeyword(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                             placeholder="검색 키워드를 입력하세요 (예: Python 강의, 요리 레시피)"
-                            className="flex-1 px-4 py-3 bg-slate-900/50 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 text-white placeholder:text-slate-500"
+                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400"
                         />
                         <button
                             onClick={handleSearch}
@@ -217,12 +210,12 @@ export default function YouTubeTranscriptPage() {
                     {/* Filter Toggle */}
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                        className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
                     >
                         <Filter className="w-4 h-4" />
                         <span>🎛️ 필터 옵션</span>
                         {getActiveFilterCount() > 0 && (
-                            <span className="px-2 py-0.5 bg-red-500/30 text-red-300 rounded-full text-xs">
+                            <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs font-semibold">
                                 {getActiveFilterCount()}
                             </span>
                         )}
@@ -231,17 +224,17 @@ export default function YouTubeTranscriptPage() {
 
                     {/* Filter Panel */}
                     {showFilters && (
-                        <div className="mt-4 pt-4 border-t border-slate-700/50 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {/* 콘텐츠 타입 */}
                             <div>
-                                <h4 className="text-sm font-semibold text-slate-300 mb-2">📹 콘텐츠 타입</h4>
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2">📹 콘텐츠 타입</h4>
                                 <div className="space-y-1">
                                     {[
                                         { value: 'all', label: '전체' },
                                         { value: 'shorts-only', label: '쇼츠만' },
                                         { value: 'exclude-shorts', label: '쇼츠 제외' },
                                     ].map((option) => (
-                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-white">
+                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
                                             <input
                                                 type="radio"
                                                 name="shorts-filter"
@@ -257,7 +250,7 @@ export default function YouTubeTranscriptPage() {
 
                             {/* 영상 길이 */}
                             <div>
-                                <h4 className="text-sm font-semibold text-slate-300 mb-2">⏱️ 영상 길이</h4>
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2">⏱️ 영상 길이</h4>
                                 <div className="space-y-1">
                                     {[
                                         { value: 'any', label: '전체' },
@@ -265,7 +258,7 @@ export default function YouTubeTranscriptPage() {
                                         { value: 'medium', label: '중간 (4-20분)' },
                                         { value: 'long', label: '긴 영상 (>20분)' },
                                     ].map((option) => (
-                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-white">
+                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
                                             <input
                                                 type="radio"
                                                 name="duration-filter"
@@ -281,7 +274,7 @@ export default function YouTubeTranscriptPage() {
 
                             {/* 업로드 기간 */}
                             <div>
-                                <h4 className="text-sm font-semibold text-slate-300 mb-2">📅 업로드 기간</h4>
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2">📅 업로드 기간</h4>
                                 <div className="space-y-1">
                                     {[
                                         { value: 'any', label: '전체' },
@@ -290,7 +283,7 @@ export default function YouTubeTranscriptPage() {
                                         { value: 'month', label: '이번 달' },
                                         { value: 'year', label: '올해' },
                                     ].map((option) => (
-                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-white">
+                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
                                             <input
                                                 type="radio"
                                                 name="upload-period"
@@ -306,7 +299,7 @@ export default function YouTubeTranscriptPage() {
 
                             {/* 언어/지역 */}
                             <div>
-                                <h4 className="text-sm font-semibold text-slate-300 mb-2">🌐 언어/지역</h4>
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2">🌐 언어/지역</h4>
                                 <div className="space-y-1">
                                     {[
                                         { value: 'any', label: '전체' },
@@ -315,7 +308,7 @@ export default function YouTubeTranscriptPage() {
                                         { value: 'ja', label: '🇯🇵 일본어' },
                                         { value: 'zh', label: '🇨🇳 중국어' },
                                     ].map((option) => (
-                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-white">
+                                        <label key={option.value} className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
                                             <input
                                                 type="radio"
                                                 name="language"
@@ -331,12 +324,12 @@ export default function YouTubeTranscriptPage() {
 
                             {/* 가중치 조절 */}
                             <div className="md:col-span-2">
-                                <h4 className="text-sm font-semibold text-slate-300 mb-3">⚖️ 점수 가중치 조절</h4>
+                                <h4 className="text-sm font-semibold text-slate-700 mb-3">⚖️ 점수 가중치 조절</h4>
                                 <div className="space-y-3">
                                     <div>
-                                        <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                        <div className="flex justify-between text-xs text-slate-500 mb-1">
                                             <span>조회수</span>
-                                            <span className="text-red-400">{viewsWeight}%</span>
+                                            <span className="text-red-500 font-semibold">{viewsWeight}%</span>
                                         </div>
                                         <input
                                             type="range"
@@ -348,9 +341,9 @@ export default function YouTubeTranscriptPage() {
                                         />
                                     </div>
                                     <div>
-                                        <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                        <div className="flex justify-between text-xs text-slate-500 mb-1">
                                             <span>참여율 (좋아요+댓글)</span>
-                                            <span className="text-red-400">{engagementWeight}%</span>
+                                            <span className="text-red-500 font-semibold">{engagementWeight}%</span>
                                         </div>
                                         <input
                                             type="range"
@@ -362,9 +355,9 @@ export default function YouTubeTranscriptPage() {
                                         />
                                     </div>
                                     <div>
-                                        <div className="flex justify-between text-xs text-slate-400 mb-1">
+                                        <div className="flex justify-between text-xs text-slate-500 mb-1">
                                             <span>최신성</span>
-                                            <span className="text-red-400">{recencyWeight}%</span>
+                                            <span className="text-red-500 font-semibold">{recencyWeight}%</span>
                                         </div>
                                         <input
                                             type="range"
@@ -380,8 +373,8 @@ export default function YouTubeTranscriptPage() {
 
                             {/* 특수 모드 & 최소 조회수 */}
                             <div>
-                                <h4 className="text-sm font-semibold text-slate-300 mb-2">🔥 특수 모드</h4>
-                                <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer hover:text-white mb-4">
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2">🔥 특수 모드</h4>
+                                <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900 mb-4">
                                     <input
                                         type="checkbox"
                                         checked={trendingMode}
@@ -391,16 +384,16 @@ export default function YouTubeTranscriptPage() {
                                     트렌딩 모드 (일일 조회수 기준)
                                 </label>
 
-                                <h4 className="text-sm font-semibold text-slate-300 mb-2">👁️ 최소 조회수</h4>
+                                <h4 className="text-sm font-semibold text-slate-700 mb-2">👁️ 최소 조회수</h4>
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="number"
                                         value={minViews}
                                         onChange={(e) => setMinViews(Number(e.target.value))}
                                         min="0"
-                                        className="w-32 px-3 py-1.5 bg-slate-900/50 rounded-lg border border-slate-700 text-white text-sm"
+                                        className="w-32 px-3 py-1.5 rounded-lg border border-slate-200 text-sm"
                                     />
-                                    <span className="text-sm text-slate-400">회 이상</span>
+                                    <span className="text-sm text-slate-500">회 이상</span>
                                 </div>
                             </div>
                         </div>
@@ -409,7 +402,7 @@ export default function YouTubeTranscriptPage() {
 
                 {/* Error Message */}
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-red-400">
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
                         ⚠️ {error}
                     </div>
                 )}
@@ -418,19 +411,19 @@ export default function YouTubeTranscriptPage() {
                 <div className="grid lg:grid-cols-2 gap-8">
                     {/* Video List */}
                     <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                             <Play className="w-5 h-5 text-red-500" />
-                            {isInitialLoad ? '🔥 오늘의 인기 영상' : `🏆 검색 결과`}
+                            {isInitialLoad ? '🔥 오늘의 인기 영상' : '🏆 검색 결과'}
                             {videos.length > 0 && <span className="text-slate-400 font-normal text-sm">({videos.length}개)</span>}
                         </h2>
 
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-12">
                                 <Loader2 className="w-8 h-8 animate-spin text-red-500 mb-4" />
-                                <p className="text-slate-400">{isInitialLoad ? '오늘의 인기 영상을 불러오는 중...' : '영상을 검색하는 중...'}</p>
+                                <p className="text-slate-600">{isInitialLoad ? '오늘의 인기 영상을 불러오는 중...' : '영상을 검색하는 중...'}</p>
                             </div>
                         ) : videos.length === 0 ? (
-                            <div className="bg-slate-800/30 rounded-xl p-8 text-center text-slate-500 border border-slate-700/30">
+                            <div className="bg-white/60 rounded-xl p-8 text-center text-slate-500 border border-slate-200">
                                 <span className="text-4xl mb-4 block">🔍</span>
                                 <p>키워드를 입력하고 검색하세요</p>
                             </div>
@@ -440,9 +433,9 @@ export default function YouTubeTranscriptPage() {
                                     <div
                                         key={video.video_id}
                                         onClick={() => handleGetTranscript(video)}
-                                        className={`bg-slate-800/50 rounded-xl p-4 cursor-pointer transition-all border ${selectedVideo?.video_id === video.video_id
-                                                ? 'border-red-500 bg-red-500/10'
-                                                : 'border-slate-700/50 hover:border-red-500/50 hover:bg-slate-800/80'
+                                        className={`bg-white rounded-xl p-4 shadow-sm cursor-pointer transition-all border-2 ${selectedVideo?.video_id === video.video_id
+                                                ? 'border-red-400 bg-red-50/50'
+                                                : 'border-transparent hover:border-red-200 hover:shadow-md'
                                             }`}
                                     >
                                         <div className="flex gap-4">
@@ -460,24 +453,24 @@ export default function YouTubeTranscriptPage() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start gap-2 mb-1">
-                                                    <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gradient-to-br from-red-500 to-pink-500 rounded text-xs font-bold">
+                                                    <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gradient-to-br from-red-500 to-pink-500 text-white rounded text-xs font-bold">
                                                         {index + 1}
                                                     </span>
-                                                    <h3 className="font-semibold text-white text-sm line-clamp-2">{video.title}</h3>
+                                                    <h3 className="font-semibold text-slate-800 text-sm line-clamp-2">{video.title}</h3>
                                                 </div>
-                                                <p className="text-xs text-slate-400 mb-2">{video.channel_title}</p>
+                                                <p className="text-xs text-slate-500 mb-2">{video.channel_title}</p>
                                                 <div className="flex flex-wrap gap-2 text-xs">
-                                                    <span className="px-2 py-0.5 bg-slate-700/50 rounded-full text-slate-300">
+                                                    <span className="px-2 py-0.5 bg-slate-100 rounded-full text-slate-600">
                                                         👁️ {video.view_count.toLocaleString()}
                                                     </span>
-                                                    <span className="px-2 py-0.5 bg-slate-700/50 rounded-full text-slate-300">
+                                                    <span className="px-2 py-0.5 bg-slate-100 rounded-full text-slate-600">
                                                         👍 {video.like_count.toLocaleString()}
                                                     </span>
-                                                    <span className="px-2 py-0.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-full text-amber-400 font-semibold">
+                                                    <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-semibold">
                                                         ⭐ {video.quality_score}점
                                                     </span>
                                                     {video.views_per_day > 0 && (
-                                                        <span className="px-2 py-0.5 bg-red-500/20 border border-red-500/30 rounded-full text-red-400">
+                                                        <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
                                                             🔥 {Math.round(video.views_per_day).toLocaleString()}/일
                                                         </span>
                                                     )}
@@ -492,12 +485,12 @@ export default function YouTubeTranscriptPage() {
 
                     {/* Transcript Panel */}
                     <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                             <FileText className="w-5 h-5 text-pink-500" />
                             대본 추출
                         </h2>
 
-                        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 min-h-[600px]">
+                        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6 min-h-[600px]">
                             {!selectedVideo ? (
                                 <div className="flex flex-col items-center justify-center h-full text-slate-500 py-16">
                                     <span className="text-5xl mb-4">📝</span>
@@ -506,19 +499,19 @@ export default function YouTubeTranscriptPage() {
                             ) : transcriptLoading ? (
                                 <div className="flex flex-col items-center justify-center py-16">
                                     <Loader2 className="w-8 h-8 animate-spin text-pink-500 mb-4" />
-                                    <p className="text-slate-400">스크립트를 불러오는 중...</p>
+                                    <p className="text-slate-600">스크립트를 불러오는 중...</p>
                                 </div>
                             ) : transcriptError ? (
-                                <div className="bg-red-500/10 rounded-xl p-6 text-center border border-red-500/30">
+                                <div className="bg-red-50 rounded-xl p-6 text-center border border-red-200">
                                     <span className="text-4xl mb-2 block">⚠️</span>
-                                    <p className="text-red-400">{transcriptError}</p>
+                                    <p className="text-red-700">{transcriptError}</p>
                                 </div>
                             ) : transcript ? (
                                 <div className="space-y-4">
                                     {/* Video Info */}
-                                    <div className="border-b border-slate-700/50 pb-4">
-                                        <h3 className="font-semibold text-white mb-2 line-clamp-2">{selectedVideo.title}</h3>
-                                        <div className="flex gap-4 text-sm text-slate-400">
+                                    <div className="border-b border-slate-200 pb-4">
+                                        <h3 className="font-semibold text-slate-800 mb-2 line-clamp-2">{selectedVideo.title}</h3>
+                                        <div className="flex gap-4 text-sm text-slate-500">
                                             <span>🌐 {transcript.language === 'ko' ? '한국어' : transcript.language}</span>
                                             <span>📊 {transcript.word_count.toLocaleString()} 단어</span>
                                         </div>
@@ -526,7 +519,7 @@ export default function YouTubeTranscriptPage() {
 
                                     {/* Controls */}
                                     <div className="flex items-center justify-between flex-wrap gap-2">
-                                        <label className="flex items-center gap-2 text-sm text-slate-400">
+                                        <label className="flex items-center gap-2 text-sm text-slate-600">
                                             <input
                                                 type="checkbox"
                                                 checked={includeTimestamps}
@@ -541,9 +534,9 @@ export default function YouTubeTranscriptPage() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={handleCopy}
-                                                className="px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center gap-1"
+                                                className="px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1"
                                             >
-                                                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                                                {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                                                 {copied ? '복사됨!' : '복사'}
                                             </button>
                                             <button
@@ -560,20 +553,20 @@ export default function YouTubeTranscriptPage() {
                                     <textarea
                                         value={transcript.text}
                                         readOnly
-                                        className="w-full h-48 p-4 bg-slate-900/50 rounded-xl border border-slate-700 text-sm text-slate-300 resize-none"
+                                        className="w-full h-48 p-4 bg-slate-50 rounded-xl border border-slate-200 text-sm text-slate-700 resize-none"
                                     />
 
                                     {/* Rewrite Panel */}
                                     {showRewrite && (
-                                        <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl p-4 border border-purple-500/30">
-                                            <h4 className="font-semibold text-white mb-4">✨ AI 스크립트 재구성</h4>
+                                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+                                            <h4 className="font-semibold text-slate-800 mb-4">✨ AI 스크립트 재구성</h4>
                                             <div className="grid grid-cols-2 gap-4 mb-4">
                                                 <div>
-                                                    <label className="block text-sm text-slate-400 mb-1">스타일</label>
+                                                    <label className="block text-sm text-slate-600 mb-1">스타일</label>
                                                     <select
                                                         value={rewriteStyle}
                                                         onChange={(e) => setRewriteStyle(e.target.value)}
-                                                        className="w-full px-3 py-2 bg-slate-900/50 rounded-lg border border-slate-700 text-sm text-white"
+                                                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
                                                     >
                                                         <option value="informative">📚 정보 전달형</option>
                                                         <option value="entertaining">🎭 엔터테인먼트형</option>
@@ -582,11 +575,11 @@ export default function YouTubeTranscriptPage() {
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm text-slate-400 mb-1">길이</label>
+                                                    <label className="block text-sm text-slate-600 mb-1">길이</label>
                                                     <select
                                                         value={rewriteLength}
                                                         onChange={(e) => setRewriteLength(e.target.value)}
-                                                        className="w-full px-3 py-2 bg-slate-900/50 rounded-lg border border-slate-700 text-sm text-white"
+                                                        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
                                                     >
                                                         <option value="shorter">짧게 (30% 요약)</option>
                                                         <option value="similar">비슷하게</option>
@@ -600,7 +593,7 @@ export default function YouTubeTranscriptPage() {
                                                     placeholder="추가 지시사항 (예: 더 친근한 말투로)"
                                                     value={rewriteInstructions}
                                                     onChange={(e) => setRewriteInstructions(e.target.value)}
-                                                    className="w-full px-3 py-2 bg-slate-900/50 rounded-lg border border-slate-700 text-sm text-white placeholder:text-slate-500"
+                                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
                                                 />
                                             </div>
                                             <button
@@ -622,19 +615,19 @@ export default function YouTubeTranscriptPage() {
                                             {rewrittenScript && (
                                                 <div className="mt-4">
                                                     <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-sm font-semibold text-white">📄 재구성된 스크립트</span>
+                                                        <span className="text-sm font-semibold text-slate-700">📄 재구성된 스크립트</span>
                                                         <button
                                                             onClick={handleCopyRewrite}
-                                                            className="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center gap-1"
+                                                            className="px-3 py-1 text-xs bg-white border border-slate-200 hover:bg-slate-50 rounded-lg flex items-center gap-1"
                                                         >
-                                                            {rewriteCopied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                                                            {rewriteCopied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
                                                             {rewriteCopied ? '복사됨!' : '복사'}
                                                         </button>
                                                     </div>
                                                     <textarea
                                                         value={rewrittenScript}
                                                         readOnly
-                                                        className="w-full h-48 p-4 bg-slate-900/50 rounded-xl border border-slate-700 text-sm text-slate-300 resize-none"
+                                                        className="w-full h-48 p-4 bg-white rounded-xl border border-slate-200 text-sm text-slate-700 resize-none"
                                                     />
                                                 </div>
                                             )}

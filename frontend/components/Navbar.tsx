@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FileText, Wand2, Image } from 'lucide-react';
+import { Home, FileText, Wand2, Youtube } from 'lucide-react';
 
 const navItems = [
     { href: '/', label: '홈', icon: Home },
     { href: '/repurpose', label: '콘텐츠 변환', icon: FileText },
-    { href: '/card-generator', label: '카드 생성', icon: Image },
+    { href: '/youtube-transcript', label: '유튜브', icon: Youtube },
     { href: '/extract-prompt', label: '프롬프트', icon: Wand2 },
 ];
 
