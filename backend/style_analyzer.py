@@ -20,7 +20,7 @@ class StyleAnalyzer:
         if not api_key:
             raise ValueError("GOOGLE_API_KEY 환경 변수가 설정되지 않았습니다.")
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.5-flash-lite')
 
     def analyze_style(self, content: str) -> dict:
         """

@@ -12,7 +12,7 @@ from .base import LLMProvider, LLMResponse
 class GeminiProvider(LLMProvider):
     """Google Gemini API Provider"""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash-lite"):
         """
         Gemini Provider 초기화
         
