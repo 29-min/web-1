@@ -86,7 +86,8 @@ export default function ExtractPromptPage() {
             });
 
             if (!response.ok) {
-                throw new Error('분석에 실패했습니다. URL을 확인해주세요.');
+                const errorData = await response.json();
+                throw new Error(errorData.detail || '분석에 실패했습니다. URL을 확인해주세요.');
             }
 
             const data = await response.json();

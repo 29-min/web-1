@@ -143,6 +143,7 @@ async def analyze_blog_style(request: AnalyzeStyleRequest):
             generated_prompt=result.get("generated_prompt", "프롬프트 생성 실패")
         )
     except Exception as e:
+        print(f"Error in analyze_blog_style: {str(e)}")  # Server log
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -228,6 +229,7 @@ async def scrape_url(request: ScrapeRequest):
             char_count=len(result.content)
         )
     except Exception as e:
+        print(f"Error in scrape_url: {str(e)}")  # Server log
         raise HTTPException(status_code=400, detail=str(e))
 
 

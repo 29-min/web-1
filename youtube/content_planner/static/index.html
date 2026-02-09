@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 콘텐츠 플래너 v2.3</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">📊</span>
+                <h1>YouTube 콘텐츠 플래너</h1>
+                <span class="version-badge">v2.3</span>
+            </div>
+            <p class="subtitle">AI 유튜브 제작 파이프라인 - 콘텐츠 기획 & 스크립트 작성</p>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="keyword-input" placeholder="검색 키워드를 입력하세요 (예: Python 강의, 요리 레시피)"
+                    autocomplete="off">
+                <button id="search-btn" class="search-btn">
+                    <span class="btn-text">분석하기</span>
+                    <span class="btn-loader hidden"></span>
+                </button>
+            </div>
+
+            <!-- Filter Toggle -->
+            <button id="filter-toggle" class="filter-toggle">
+                <span>🎛️ 필터 옵션</span>
+                <span id="filter-arrow" class="filter-arrow">▼</span>
+            </button>
+
+            <!-- Filter Panel -->
+            <div id="filter-panel" class="filter-panel hidden">
+                <!-- 콘텐츠 타입 -->
+                <div class="filter-group">
+                    <h4>📹 콘텐츠 타입</h4>
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="radio" name="shorts-filter" value="all" checked>
+                            <span>전체</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="shorts-filter" value="shorts-only">
+                            <span>쇼츠만</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="shorts-filter" value="exclude-shorts">
+                            <span>쇼츠 제외</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 영상 길이 -->
+                <div class="filter-group">
+                    <h4>⏱️ 영상 길이</h4>
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="radio" name="duration-filter" value="any" checked>
+                            <span>전체</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="duration-filter" value="short">
+                            <span>짧은 영상 (&lt;4분)</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="duration-filter" value="medium">
+                            <span>중간 (4-20분)</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="duration-filter" value="long">
+                            <span>긴 영상 (&gt;20분)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 업로드 기간 -->
+                <div class="filter-group">
+                    <h4>📅 업로드 기간</h4>
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="radio" name="upload-period" value="any" checked>
+                            <span>전체</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="upload-period" value="day">
+                            <span>오늘</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="upload-period" value="week">
+                            <span>이번 주</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="upload-period" value="month">
+                            <span>이번 달</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="upload-period" value="year">
+                            <span>올해</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 언어 필터 -->
+                <div class="filter-group">
+                    <h4>🌐 언어/지역</h4>
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="radio" name="language-filter" value="any" checked>
+                            <span>전체</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="language-filter" value="ko">
+                            <span>🇰🇷 한국어</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="language-filter" value="en">
+                            <span>🇺🇸 영어</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="language-filter" value="ja">
+                            <span>🇯🇵 일본어</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="radio" name="language-filter" value="zh">
+                            <span>🇨🇳 중국어</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 가중치 조절 -->
+                <div class="filter-group weight-group">
+                    <h4>⚖️ 점수 가중치 조절</h4>
+                    <div class="weight-sliders">
+                        <div class="slider-item">
+                            <label>
+                                <span>조회수</span>
+                                <span id="views-weight-value" class="weight-value">35%</span>
+                            </label>
+                            <input type="range" id="views-weight" min="0" max="100" value="35">
+                        </div>
+                        <div class="slider-item">
+                            <label>
+                                <span>참여율 (좋아요+댓글)</span>
+                                <span id="engagement-weight-value" class="weight-value">40%</span>
+                            </label>
+                            <input type="range" id="engagement-weight" min="0" max="100" value="40">
+                        </div>
+                        <div class="slider-item">
+                            <label>
+                                <span>최신성</span>
+                                <span id="recency-weight-value" class="weight-value">25%</span>
+                            </label>
+                            <input type="range" id="recency-weight" min="0" max="100" value="25">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 트렌딩 모드 -->
+                <div class="filter-group">
+                    <h4>🔥 특수 모드</h4>
+                    <div class="filter-options">
+                        <label class="filter-checkbox trending-toggle">
+                            <input type="checkbox" id="trending-mode">
+                            <span>트렌딩 모드 (일일 조회수 기준 정렬)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 최소 조회수 -->
+                <div class="filter-group">
+                    <h4>👁️ 최소 조회수</h4>
+                    <div class="min-views-input">
+                        <input type="number" id="min-views" value="0" min="0" placeholder="0">
+                        <span>회 이상</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Filters Display -->
+        <div id="active-filters" class="active-filters hidden"></div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section hidden">
+            <div class="results-header">
+                <h2 id="results-title">🏆 Top 10 인기 영상</h2>
+                <span id="result-keyword" class="result-keyword"></span>
+            </div>
+            <div id="video-list" class="video-list"></div>
+
+            <!-- 더보기 버튼 -->
+            <div id="load-more-container" class="load-more-container hidden">
+                <button id="load-more-btn" class="load-more-btn">
+                    <span class="load-more-text">더보기 (최대 30개)</span>
+                    <span class="load-more-loader hidden"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Error Section -->
+        <div id="error-section" class="error-section hidden">
+            <div class="error-box">
+                <span class="error-icon">⚠️</span>
+                <p id="error-message"></p>
+            </div>
+        </div>
+
+        <!-- Loading State (초기 로딩) -->
+        <section id="loading-state" class="loading-state hidden">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p>오늘의 인기 영상을 불러오는 중...</p>
+            </div>
+        </section>
+
+        <!-- Empty State (검색 전) - 이제 트렌딩으로 대체되므로 숨김 -->
+        <section id="empty-state" class="empty-state hidden">
+            <div class="empty-content">
+                <span class="empty-icon">🔍</span>
+                <h3>영상을 검색해보세요</h3>
+                <p>키워드를 입력하고 필터를 설정하면 맞춤형 Top 10 영상을 분석합니다.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- 스크립트 모달 -->
+    <div id="transcript-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeTranscriptModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 영상 스크립트</h3>
+                <button class="modal-close" onclick="closeTranscriptModal()">×</button>
+            </div>
+            <div class="modal-info">
+                <span id="transcript-video-title" class="transcript-title"></span>
+                <div class="transcript-meta">
+                    <span id="transcript-language"></span>
+                    <span id="transcript-word-count"></span>
+                </div>
+            </div>
+            <div id="transcript-loading" class="transcript-loading hidden">
+                <div class="loading-spinner"></div>
+                <p>스크립트를 불러오는 중...</p>
+            </div>
+            <div id="transcript-error" class="transcript-error hidden">
+                <span>⚠️</span>
+                <p id="transcript-error-message"></p>
+            </div>
+            <div id="transcript-content" class="transcript-content hidden">
+                <textarea id="transcript-text" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <label class="timestamp-toggle">
+                    <input type="checkbox" id="include-timestamps" onchange="reloadTranscript()">
+                    <span>타임스탬프 포함</span>
+                </label>
+                <div class="modal-footer-buttons">
+                    <button id="copy-transcript-btn" class="copy-btn" onclick="copyTranscript()">
+                        📋 복사하기
+                    </button>
+                    <button id="rewrite-btn" class="rewrite-btn hidden" onclick="openRewritePanel()">
+                        ✨ AI로 재구성
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI 재구성 패널 -->
+            <div id="rewrite-panel" class="rewrite-panel hidden">
+                <div class="rewrite-header">
+                    <h4>✨ AI 스크립트 재구성</h4>
+                    <button class="rewrite-close" onclick="closeRewritePanel()">×</button>
+                </div>
+                <div class="rewrite-options">
+                    <div class="option-group">
+                        <label>스타일</label>
+                        <select id="rewrite-style">
+                            <option value="informative">📚 정보 전달형</option>
+                            <option value="entertaining">🎭 엔터테인먼트형</option>
+                            <option value="educational">🎓 교육형</option>
+                            <option value="conversational">💬 대화형</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label>길이</label>
+                        <select id="rewrite-length">
+                            <option value="shorter">짧게 (30% 요약)</option>
+                            <option value="similar" selected>비슷하게</option>
+                            <option value="longer">길게 (30% 확장)</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label>추가 지시사항</label>
+                        <input type="text" id="rewrite-instructions" placeholder="예: 더 친근한 말투로">
+                    </div>
+                </div>
+                <div class="rewrite-actions">
+                    <button id="generate-btn" class="generate-btn" onclick="generateRewrite()">
+                        🚀 재구성 시작
+                    </button>
+                </div>
+                <div id="rewrite-loading" class="rewrite-loading hidden">
+                    <div class="loading-spinner"></div>
+                    <p>AI가 스크립트를 재구성하는 중...</p>
+                </div>
+                <div id="rewrite-result" class="rewrite-result hidden">
+                    <div class="result-header">
+                        <span>📄 재구성된 스크립트</span>
+                        <span id="rewrite-info"></span>
+                    </div>
+                    <textarea id="rewrite-text" readonly></textarea>
+                    <button class="copy-btn" onclick="copyRewrite()">
+                        📋 재구성 스크립트 복사
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
