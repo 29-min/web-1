@@ -16,9 +16,9 @@ class StyleAnalyzer:
     """Analyzes writing style from blog content and generates prompts."""
 
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY")
+        api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError("GOOGLE_API_KEY 환경 변수가 설정되지 않았습니다.")
+            raise ValueError("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel('gemini-2.5-flash-lite')
 
